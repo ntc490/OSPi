@@ -5,9 +5,9 @@ import datetime
 
 class Program(object):
     def __init__(self, name="", weekdays=None, start_time=None, description=""):
-        if not isinstance(weekdays, Weekdays):
+        if not weekdays is None and not isinstance(weekdays, Weekdays):
             raise ValueError('weekdays need to be a weekdays.Weekdays() object')
-        if not isinstance(start_time, datetime.time):
+        if not start_time is None and not isinstance(start_time, datetime.time):
             raise ValueError('start_time needs to be a datetime.time() object')
         self.name = name
         self.weekdays = weekdays or Weekdays()
