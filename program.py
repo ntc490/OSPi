@@ -10,17 +10,21 @@ class Program(object):
         if not start_time is None and not isinstance(start_time, datetime.time):
             raise ValueError('start_time needs to be a datetime.time() object')
         self.name = name
+        self.enabled = True
         self.weekdays = weekdays or Weekdays()
         self.start_time = start_time or datetime.time()
         self.instructions = []
         self.description = description
 
-    def should_trigger(self, date_and_time):
+    def is_start_datetime(self, date_and_time):
         """
         Determine if the program should trigger for the datetime object passed in
         """
         if not isinstance(date_and_time, datetime.datetime):
             raise ValueError('date_and_time needs to be of type datetime.datetime')
+
+        if not self.enabled:
+            return False
         if not Weekday(date_and_time.weekday()) in self.weekdays:
             return False
         if not date_and_time.time().hour == self.start_time.hour:
@@ -51,8 +55,8 @@ if __name__ == '__main__':
                         datetime.time(hour=5, minute=0),
                         description="Test program with no instructions")
             print p
-            self.assertTrue(p.should_trigger(datetime.datetime(year=2015, month=4, day=24, hour=5, minute=0)))
-            self.assertRaises(ValueError, lambda : p.should_trigger("foo"))
+            self.assertTrue(p.is_start_datetime(datetime.datetime(year=2015, month=4, day=24, hour=5, minute=0)))
+            self.assertRaises(ValueError, lambda : p.is_start_datetime("foo"))
 
     print "Running programs unittest"
     unittest.main()
