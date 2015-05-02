@@ -13,7 +13,7 @@ class Program(object):
         self.enabled = True
         self.weekdays = weekdays or Weekdays()
         self.start_time = start_time or datetime.time()
-        self.instructions = []
+        self.steps = []
         self.description = description
 
     def is_start_datetime(self, date_and_time):
@@ -41,6 +41,43 @@ class Program(object):
         Description:  %s
         """ % (self.name, self.start_time, str(self.weekdays), self.description)
 
+
+class ProgramList(object):
+    """
+    List of programs that stays sorted in chronological order so testing for
+    'ready' programs is as quick as possible
+    """
+    def __init__(self, programs=None):
+        self.programs = programs or []
+
+    def append(self, program):
+        """
+        Add the program to the list in sorted order
+        """
+        self.programs.append(program)
+        # Sort list
+
+    def delete(self, name):
+        """
+        Delete all programs named 'name'
+        """
+        for program in self.programs:
+            if program.name == name:
+                program_num = self.programs.index(program)
+                del self.programs[program_num]
+
+    def get_ready_program(self, datetime):
+        """
+        Get a reference to the first ready program in the list
+        """
+        for program in self.programs:
+            if program.is_start_datetime(datetime):
+                return program
+        return None
+
+    def __len__(self):
+        return len(self.programs)
+    
 
 
 
