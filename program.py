@@ -23,8 +23,6 @@ class Program(object):
         if not isinstance(date_and_time, datetime.datetime):
             raise ValueError('date_and_time needs to be of type datetime.datetime')
 
-        if not self.enabled:
-            return False
         if not Weekday(date_and_time.weekday()) in self.weekdays:
             return False
         if not date_and_time.time().hour == self.start_time.hour:
@@ -71,13 +69,13 @@ class ProgramList(object):
         Get a reference to the first ready program in the list
         """
         for program in self.programs:
-            if program.is_start_datetime(datetime):
+            if program.is_start_datetime(datetime) and program.enabled:
                 return program
         return None
 
     def __len__(self):
         return len(self.programs)
-    
+
 
 
 
