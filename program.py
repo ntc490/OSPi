@@ -1,6 +1,8 @@
 #!/usr/bin/python
 from weekdays import *
 import datetime
+import steps
+
 
 
 class Program(object):
@@ -42,8 +44,7 @@ class Program(object):
 
 class ProgramList(object):
     """
-    List of programs that stays sorted in chronological order so testing for
-    'ready' programs is as quick as possible
+    Manage a list of programs: collect or delete them, or find 'ready' programs
     """
     def __init__(self, programs=None):
         self.programs = programs or []
@@ -53,7 +54,6 @@ class ProgramList(object):
         Add the program to the list in sorted order
         """
         self.programs.append(program)
-        # Sort list
 
     def delete(self, name):
         """
@@ -64,14 +64,15 @@ class ProgramList(object):
                 program_num = self.programs.index(program)
                 del self.programs[program_num]
 
-    def get_ready_program(self, datetime):
+    def get_ready_programs(self, datetime):
         """
-        Get a reference to the first ready program in the list
+        Return a list of ready programs from our list
         """
+        ready_programs = []
         for program in self.programs:
             if program.is_start_datetime(datetime) and program.enabled:
-                return program
-        return None
+                ready_programs.append(program)
+        return ready_programs
 
     def __len__(self):
         return len(self.programs)
@@ -92,6 +93,21 @@ if __name__ == '__main__':
             print p
             self.assertTrue(p.is_start_datetime(datetime.datetime(year=2015, month=4, day=24, hour=5, minute=0)))
             self.assertRaises(ValueError, lambda : p.is_start_datetime("foo"))
+
+    class StepTests(unittest.TestCase):
+        def test(self):
+            p = Program("test",
+                        Weekdays(Weekday(MONDAY), Weekday(WEDNESDAY), Weekday(FRIDAY)),
+                        datetime.time(hour=5, minute=0),
+                        description="Test program with simple instructions")
+            p.steps = [ steps.Step(['station1', ], 5 * 60),
+                        steps.Step(['station2', ], 5 * 60),
+                        steps.Step(['station3', ], 5 * 60),
+                        steps.Step(['station4', 'station5', ], 5 * 60) ]
+            print p
+            for step in p.steps:
+                print step
+
 
     print "Running programs unittest"
     unittest.main()

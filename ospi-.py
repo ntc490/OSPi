@@ -10,7 +10,9 @@ import thread
 from calendar import timegm
 import sys
 sys.path.append('./plugins')
-impport datetime
+import datetime
+import copy
+import program
 
 import web  # the Web.py module. See webpy.org (Enables the Python OpenSprinkler web interface)
 import gv
@@ -21,7 +23,7 @@ from gpio_pins import set_output
 
 
 # Global variables
-PROGRAM_LIST = []
+PROGRAM_LIST = program.ProgramList()
 
 
 def sort_program_list(programs):
@@ -58,16 +60,16 @@ class Controller(object):
         global PROGRAM_LIST
         current_datetime = datetime.datetime.now()
         mutex.acquire()
-        program_to_run = PROGRAM_LIST.get_ready_program(current_datetime)
-        if program_to_run:
-            # Copy program and any referenced data structures
-            # Change state to 'running'
+        programs_to_run = PROGRAM_LIST.get_ready_programs(current_datetime)
+        if len(programs_to_run) > 0:
+            # Deep copy keeps others from pulling the rug out from under the controller
+            self.running_program = copy.deepcopy(programs_to_run[0])
+            # TODO: Log remaining ready programs since we never run more than one at a time
+            self.state = STATE_RUNNING_PROGRAM
         mutex.release()
 
     def __running_program_state(self):
         
-    
-
 
 class OSPiApp(web.application):
     """Allow program to select HTTP port."""
